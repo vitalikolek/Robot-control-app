@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mongo:
+    container_name: mongo-db
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: robot_app
+    volumes:
+      - mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo
+    restart: unless-stopped
+
+networks:
+  mongo:
+    driver: bridge
+
+volumes:
+  mongo:
