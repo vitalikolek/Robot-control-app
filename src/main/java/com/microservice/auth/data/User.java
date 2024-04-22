@@ -16,7 +16,7 @@ import java.util.Collection;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
+@Document(collection = "administrators")
 public class User implements UserDetails {
 
     @Id
@@ -26,7 +26,6 @@ public class User implements UserDetails {
     private String email;
     private String phone;
     private String password;
-    private AccountType accountType;
 
     @DBRef
     private RefreshToken token;

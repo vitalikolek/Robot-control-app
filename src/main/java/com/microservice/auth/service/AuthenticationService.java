@@ -3,17 +3,13 @@ package com.microservice.auth.service;
 import com.microservice.auth.config.JwtService;
 import com.microservice.auth.data.RefreshToken;
 import com.microservice.auth.data.User;
-import com.microservice.auth.exceptions.UserNotExistException;
-import com.microservice.auth.persistence.CodeRepository;
 import com.microservice.auth.persistence.RefreshTokenRepository;
 import com.microservice.auth.persistence.UserRepository;
 import com.microservice.auth.request.AuthenticationRequest;
-import com.microservice.auth.request.CreatePasswordRequest;
 import com.microservice.auth.request.RegisterRequest;
 import com.microservice.auth.response.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,12 +23,9 @@ import java.time.Instant;
 public class AuthenticationService {
     private final UserRepository repository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final CodeRepository codeRepository;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final StreamBridge streamBridge;
 
     private void saveUserToken(User user, String jwtToken) {
         var token = RefreshToken.builder().userId(user.getId()).token(jwtToken).expiryDate(Instant.now().plusMillis(jwtService.getRefreshExpiration())).build();
@@ -44,14 +37,6 @@ public class AuthenticationService {
         var user = User.builder().firstname(request.getFirstname()).lastname(request.getLastname()).email(request.getEmail()).phone(request.getPhone()).password(passwordEncoder.encode(request.getPassword())).build();
         repository.save(user);
         log.info("User {} registered", user.getId());
-        return generateTokens(user);
-    }
-
-    public AuthenticationResponse createPassword(CreatePasswordRequest request) {
-        var user = userRepository.findByPhone(request.getPhone()).orElseThrow(UserNotExistException::new);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        repository.save(user);
-        log.info("For user {} created and save password", user.getId());
         return generateTokens(user);
     }
 

@@ -20,8 +20,8 @@ public class RefreshToken {
 
 	@Id
 	public String id;
-	@JsonProperty("user_id")
-	@Field("user_id")
+	@JsonProperty("administrators_id")
+	@Field("administrators_id")
 	private String userId;
 	private String token;
 	private Instant expiryDate;
