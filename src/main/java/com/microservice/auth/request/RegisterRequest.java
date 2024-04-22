@@ -23,8 +23,6 @@ public class RegisterRequest {
     @NotBlank
     private String email;
     @NotBlank
-    private String phone;
-    @NotBlank
     @Size(min = 8, message = "Password must be min 8 symbols")
     private String password;
 }

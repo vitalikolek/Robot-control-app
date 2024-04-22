@@ -24,7 +24,6 @@ public class User implements UserDetails {
     private String firstname;
     private String lastname;
     private String email;
-    private String phone;
     private String password;
 
     @DBRef
@@ -42,7 +41,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return phone;
+        return email;
     }
 
     @Override

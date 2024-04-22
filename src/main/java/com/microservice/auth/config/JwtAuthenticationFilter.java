@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private void authorizationUser(HttpServletRequest request, HttpServletResponse response,
 								   FilterChain filterChain, String jwt) throws IOException, ServletException {
-		String userPhone = jwtService.extractPhone(jwt);
+		String userPhone = jwtService.extractEmail(jwt);
 		UserDetails userDetails = this.userDetailsService.loadUserByUsername(userPhone);
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 				userDetails,

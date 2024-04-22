@@ -30,11 +30,11 @@ public class JwtService {
 	private long refreshExpiration;
 
 	public boolean isRefreshTokenValid(String refreshToken, UserDetails userDetails) {
-		final String username = extractPhone(refreshToken);
+		final String username = extractEmail(refreshToken);
 		return (username.equals(userDetails.getUsername())) && !isTokenExpired(refreshToken);
 	}
 
-	public String extractPhone(String token) {
+	public String extractEmail(String token) {
 		return extractClaims(token, Claims::getSubject);
 	}
 
@@ -55,7 +55,7 @@ public class JwtService {
 			Map<String, Object> extraClaims,
 			User userDetails
 	) {
-		extraClaims.put("phone", userDetails.getPhone());
+		extraClaims.put("email", userDetails.getEmail());
 		return buildToken(extraClaims, userDetails, jwtExpiration);
 	}
 
@@ -84,7 +84,7 @@ public class JwtService {
 	}
 
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String username = extractPhone(token);
+		final String username = extractEmail(token);
 		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 
