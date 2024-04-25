@@ -25,5 +25,4 @@ public class RefreshToken {
 	private String userId;
 	private String token;
 	private Instant expiryDate;
-
 }
