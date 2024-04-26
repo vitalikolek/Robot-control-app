@@ -22,7 +22,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.microservice.auth" level="all" additivity="false">
+    <logger name="com.microservice.robot" level="all" additivity="false">
         <appender-ref ref="Console" />
         <appender-ref ref="FILE-ROLLING" />
     </logger>
