@@ -20,7 +20,7 @@ public class Robot {
     @Id
     private int id;
     @DBRef
-    private User administrator;
+    private User administratorId;
     private Status status;
     private String currentTask;
     private Instant lastCheckIn;

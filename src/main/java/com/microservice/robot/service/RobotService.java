@@ -1,16 +1,18 @@
 package com.microservice.robot.service;
 
-import ch.qos.logback.core.spi.SequenceNumberGenerator;
 import com.microservice.robot.data.Robot;
 import com.microservice.robot.data.Status;
 import com.microservice.robot.data.User;
 import com.microservice.robot.persistence.RobotRepository;
 import com.microservice.robot.persistence.UserRepository;
+import com.microservice.robot.request.OnRobotRequest;
+import com.microservice.robot.response.RobotStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +21,6 @@ public class RobotService {
 
     private UserRepository userRepository;
     private RobotRepository robotRepository;
-    private SequenceNumberGenerator sequenceNumberGenerator;
 
     @Autowired
     public RobotService(UserRepository userRepository, RobotRepository robotRepository) {
@@ -35,15 +36,59 @@ public class RobotService {
         Robot lastDocument = robotRepository.findTopByOrderByIdDesc();
         int newIndex = 1;
         if (lastDocument != null) {
-            newIndex = robot.getId() + 1;
+            newIndex = lastDocument.getId() + 1;
         }
         robot.setId(newIndex);
 
-        robot.setAdministrator(user.get());
+        robot.setAdministratorId(user.get());
         robot.setStatus(Status.OFFLINE);
         robot.setCurrentTask("Robot offline");
         robot.setLastCheckIn(Instant.now());
 
         robotRepository.save(robot);
+    }
+
+    public List<Robot> getRobots(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        return robotRepository.findAllByAdministratorId(user.get().getId());
+    }
+
+    public void onRobot(String email, Integer id, OnRobotRequest request) {
+        Robot robot = robotRepository.findById(id);
+
+        if (!robot.getAdministratorId().getEmail().equals(email)) return;
+
+        robot.setCurrentTask(request.getTask());
+        robot.setStatus(Status.ONLINE);
+        robot.setLastCheckIn(Instant.now());
+
+        robotRepository.save(robot);
+    }
+
+    public void offRobot(String email, Integer robotId) {
+        Robot robot = robotRepository.findById(robotId);
+
+        if (!robot.getAdministratorId().getEmail().equals(email)) return;
+
+        robot.setCurrentTask("Robot offline");
+        robot.setStatus(Status.OFFLINE);
+        robot.setLastCheckIn(Instant.now());
+
+        robotRepository.save(robot);
+    }
+
+    public RobotStatusResponse getStatus(String email, Integer robotId) {
+        Robot robot = robotRepository.findById(robotId);
+
+        if (!robot.getAdministratorId().getEmail().equals(email)) {
+            throw new RuntimeException();
+        }
+
+        RobotStatusResponse response = new RobotStatusResponse();
+        response.setStatus(robot.getStatus());
+        response.setCurrentTask(robot.getCurrentTask());
+        response.setLastCheckIn(robot.getLastCheckIn());
+
+        return response;
     }
 }
