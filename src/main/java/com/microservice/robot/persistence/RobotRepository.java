@@ -10,6 +10,8 @@ import java.util.List;
 public interface RobotRepository extends MongoRepository<Robot, String> {
 
     Robot findTopByOrderByIdDesc();
+
     List<Robot> findAllByAdministratorId(String administratorId);
+
     Robot findById(Integer id);
 }

@@ -1,11 +1,14 @@
 package com.microservice.robot.service;
 
 import com.microservice.robot.data.Robot;
+import com.microservice.robot.data.RobotFeedback;
 import com.microservice.robot.data.Status;
 import com.microservice.robot.data.User;
+import com.microservice.robot.persistence.RobotFeedbackRepository;
 import com.microservice.robot.persistence.RobotRepository;
 import com.microservice.robot.persistence.UserRepository;
 import com.microservice.robot.request.OnRobotRequest;
+import com.microservice.robot.request.RobotFeedbackRequest;
 import com.microservice.robot.response.RobotStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +24,13 @@ public class RobotService {
 
     private UserRepository userRepository;
     private RobotRepository robotRepository;
+    private RobotFeedbackRepository robotFeedbackRepository;
 
     @Autowired
-    public RobotService(UserRepository userRepository, RobotRepository robotRepository) {
+    public RobotService(UserRepository userRepository, RobotRepository robotRepository, RobotFeedbackRepository robotFeedbackRepository) {
         this.userRepository = userRepository;
         this.robotRepository = robotRepository;
+        this.robotFeedbackRepository = robotFeedbackRepository;
     }
 
     public void saveRobot(String email) {
@@ -90,5 +95,33 @@ public class RobotService {
         response.setLastCheckIn(robot.getLastCheckIn());
 
         return response;
+    }
+
+    public void addFeedback(Integer robotId, RobotFeedbackRequest request) {
+        Robot robot = robotRepository.findById(robotId);
+
+        RobotFeedback feedback = new RobotFeedback();
+
+        RobotFeedback lastDocument = robotFeedbackRepository.findTopByOrderByIdDesc();
+        int newIndex = 1;
+        if (lastDocument != null) {
+            newIndex = lastDocument.getId() + 1;
+        }
+        feedback.setId(newIndex);
+        feedback.setRobotId(robot);
+        feedback.setRating(request.getRating());
+        feedback.setFeedback(request.getFeedback());
+
+        robotFeedbackRepository.save(feedback);
+    }
+
+    public List<RobotFeedback> getFeedbacks(String email, Integer robotId) {
+        Robot robot = robotRepository.findById(robotId);
+
+        if (!robot.getAdministratorId().getEmail().equals(email)) {
+            throw new RuntimeException();
+        }
+
+        return robotFeedbackRepository.findAllByRobotId(robot);
     }
 }

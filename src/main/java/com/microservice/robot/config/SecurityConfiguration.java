@@ -30,7 +30,8 @@ public class SecurityConfiguration {
             "/webjars/**",
             "/swagger-ui.html",
             "/actuator/**",
-            "/actuator/metrics/**"};
+            "/actuator/metrics/**," +
+            "/robot/feedback/**"};
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
